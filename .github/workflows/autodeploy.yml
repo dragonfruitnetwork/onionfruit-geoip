@@ -1,0 +1,58 @@
+name: Auto deploy
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+  LOC_VERSION: "libloc-0.9.5"
+  LOC_DL_PATH: "loc.tar.gz"
+  TOR_SRC_DIR: "tor-src"
+  LOC_SRC_DIR: "loc-src"
+  DUMP_PATH: "dump.txt"
+  EXPORT_DIR: "public"
+  
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Record Current Dir
+      run: DIR=$PWD
+      
+    - name: Install Dependencies
+      run: apt update && apt install curl build-essential -y
+      
+    - name: Install latest rust toolchain
+      uses: actions-rs/toolchain@v1
+    
+    - name: Clone Tor
+      run: git clone https://github.com/torproject/tor.git --depth 1 $TOR_SRC_DIR
+      
+    - name: Download loc
+      run: curl https://source.ipfire.org/releases/libloc/$LOC_VERSION.tar.gz -o $LOC_DL_PATH
+      
+    - name: Extract loc
+      run: tar -xf $LOC_DL_PATH -C $LOC_SRC_DIR
+      
+    - name: Build and Install loc
+      working-directory: $LOC_SRC_DIR/$LOC_VERSION
+      run: |
+        ./autogen.sh
+        ./configure CFLAGS='-g -O2' --disable-perl --without-systemd --prefix=/opt/libloc
+        make
+        make install
+        
+    - name: Dump all location data
+      run: |
+        location update
+        location dump $DUMP_PATH
+        
+    - name: Run Conversion Tool
+      working-directory: $TOR_SRC_DIR/scripts/maint/geoip/geoip-db-tool
+      run: |
+        cargo build --release
+        cargo run --release -- -i $DIR/$DUMP_PATH -4 $DIR/$EXPORT_DIR/geoip -6 $DIR/$EXPORT_DIR/geoip6
+      
