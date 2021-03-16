@@ -38,7 +38,9 @@ jobs:
       run: curl https://source.ipfire.org/releases/libloc/$LOC_VERSION.tar.gz -o $LOC_DL_PATH
       
     - name: Extract loc
-      run: tar -xf $LOC_DL_PATH -C $LOC_SRC_DIR
+      run: |
+        mkdir $LOC_SRC_DIR
+        tar -xf $LOC_DL_PATH -C $LOC_SRC_DIR
       
     - name: Build and Install loc
       working-directory: $LOC_SRC_DIR/$LOC_VERSION
