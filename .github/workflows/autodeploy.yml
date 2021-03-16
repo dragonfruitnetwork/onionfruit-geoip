@@ -23,7 +23,7 @@ jobs:
       run: DIR=$PWD
       
     - name: Install Dependencies
-      run: apt update && apt install curl build-essential -y
+      run: sudo apt update && sudo apt install curl build-essential -y
       
     - name: Install latest rust toolchain
       uses: actions-rs/toolchain@v1
@@ -43,7 +43,7 @@ jobs:
         ./autogen.sh
         ./configure CFLAGS='-g -O2' --disable-perl --without-systemd --prefix=/opt/libloc
         make
-        make install
+        sudo make install
         
     - name: Dump all location data
       run: |
