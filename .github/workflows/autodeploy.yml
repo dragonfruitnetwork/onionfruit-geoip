@@ -40,11 +40,11 @@ jobs:
     - name: Extract loc
       run: |
         mkdir $LOC_SRC_DIR
-        tar -xf $LOC_DL_PATH -C $LOC_SRC_DIR
+        tar -xfv $LOC_DL_PATH -C $LOC_SRC_DIR
       
     - name: Build and Install loc
-      working-directory: $LOC_SRC_DIR/$LOC_VERSION
       run: |
+        cd $DIR/$LOC_SRC_DIR/$LOC_VERSION
         ./autogen.sh
         ./configure CFLAGS='-g -O2' --disable-perl --without-systemd --prefix=/opt/libloc
         make
@@ -56,8 +56,8 @@ jobs:
         location dump $DUMP_PATH
         
     - name: Run Conversion Tool
-      working-directory: $TOR_SRC_DIR/scripts/maint/geoip/geoip-db-tool
       run: |
+        cd $DIR/$TOR_SRC_DIR/scripts/maint/geoip/geoip-db-tool
         cargo build --release
         cargo run --release -- -i $DIR/$DUMP_PATH -4 $DIR/$EXPORT_DIR/geoip -6 $DIR/$EXPORT_DIR/geoip6
       
