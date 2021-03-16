@@ -42,6 +42,7 @@ jobs:
     - name: Build and Install loc
       working-directory: ${{ env.GITHUB_WORKSPACE }}/${{ env.LOC_SRC_DIR }}/${{ env.LOC_VERSION }}
       run: |
+        chmod +x ./autogen.sh
         ./autogen.sh
         ./configure CFLAGS='-g -O2' --disable-perl --without-systemd --prefix=/opt/libloc
         make
