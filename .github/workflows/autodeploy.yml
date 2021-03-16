@@ -40,7 +40,7 @@ jobs:
     - name: Extract loc
       run: |
         mkdir $LOC_SRC_DIR
-        tar -xfv $LOC_DL_PATH -C $LOC_SRC_DIR
+        tar xfv $LOC_DL_PATH -C $LOC_SRC_DIR
       
     - name: Build and Install loc
       run: |
