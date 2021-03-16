@@ -12,16 +12,15 @@ env:
   LOC_SRC_DIR: "loc-src"
   DUMP_PATH: "dump.txt"
   EXPORT_DIR: "public"
-
-defaults:
-  run:
-    working-directory: ${{ env.GITHUB_WORKSPACE }}
   
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:      
+    - name: Checkout
+      uses: actions/checkout@v2
+      
     - name: Install Dependencies
       run: sudo apt update && sudo apt install curl build-essential -y
       
@@ -43,9 +42,8 @@ jobs:
         tar xfv $LOC_DL_PATH -C $LOC_SRC_DIR
       
     - name: Build and Install loc
-      working-directory: ${{ env.GITHUB_WORKSPACE }}
+      working-directory: ${{ env.GITHUB_WORKSPACE }}/${{ env.LOC_SRC_DIR }}/${{ env.LOC_VERSION }}
       run: |
-        cd $LOC_SRC_DIR/$LOC_VERSION
         ./autogen.sh
         ./configure CFLAGS='-g -O2' --disable-perl --without-systemd --prefix=/opt/libloc
         make
