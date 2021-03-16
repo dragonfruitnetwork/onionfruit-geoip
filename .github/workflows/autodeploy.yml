@@ -18,10 +18,7 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    steps:
-    - name: Record Current Dir
-      run: DIR=$PWD
-      
+    steps:      
     - name: Install Dependencies
       run: sudo apt update && sudo apt install curl build-essential -y
       
@@ -43,8 +40,8 @@ jobs:
         tar xfv $LOC_DL_PATH -C $LOC_SRC_DIR
       
     - name: Build and Install loc
+      working-directory: ${{ env.GITHUB_WORKSPACE }}/${{ env.LOC_SRC_DIR }}/${{ env.LOC_VERSION }}
       run: |
-        cd $DIR/$LOC_SRC_DIR/$LOC_VERSION
         ./autogen.sh
         ./configure CFLAGS='-g -O2' --disable-perl --without-systemd --prefix=/opt/libloc
         make
@@ -56,8 +53,8 @@ jobs:
         location dump $DUMP_PATH
         
     - name: Run Conversion Tool
+      working-directory: ${{ env.GITHUB_WORKSPACE }}/${{ env.TOR_SRC_DIR }}/scripts/maint/geoip/geoip-db-tool
       run: |
-        cd $DIR/$TOR_SRC_DIR/scripts/maint/geoip/geoip-db-tool
         cargo build --release
-        cargo run --release -- -i $DIR/$DUMP_PATH -4 $DIR/$EXPORT_DIR/geoip -6 $DIR/$EXPORT_DIR/geoip6
+        cargo run --release -- -i $GITHUB_WORKSPACE/$DUMP_PATH -4 $GITHUB_WORKSPACE/$EXPORT_DIR/geoip -6 $GITHUB_WORKSPACE/$EXPORT_DIR/geoip6
       
