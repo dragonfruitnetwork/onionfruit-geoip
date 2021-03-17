@@ -22,7 +22,7 @@ jobs:
       uses: actions/checkout@v2
       
     - name: Install Dependencies
-      run: sudo apt update && sudo apt install curl build-essential intltool asciidoc -y
+      run: sudo apt update && sudo apt install curl build-essential intltool asciidoc software-properties-common -y
       
     - name: Install latest Rust Toolchain
       uses: actions-rs/toolchain@v1
@@ -30,11 +30,8 @@ jobs:
         profile: minimal
         toolchain: stable
     
-    - name: Install Python 3.x
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-        architecture: 'x64'
+    - name: Install Python 3.9
+      run:  sudo apt install python3.9
     
     - name: Clone Tor
       run: git clone https://github.com/torproject/tor.git --depth 1 $TOR_SRC_DIR
