@@ -22,7 +22,7 @@ jobs:
       uses: actions/checkout@v2
       
     - name: Install Dependencies
-      run: sudo apt update && sudo apt install curl build-essential intltool asciidoc python3.9 software-properties-common -y
+      run: sudo apt update && sudo apt install curl build-essential intltool asciidoc python3.8 python3.9 software-properties-common -y
       
     - name: Install latest Rust Toolchain
       uses: actions-rs/toolchain@v1
