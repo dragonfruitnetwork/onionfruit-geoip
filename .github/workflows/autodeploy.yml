@@ -22,7 +22,7 @@ jobs:
       uses: actions/checkout@v2
       
     - name: Install Dependencies
-      run: sudo apt update && sudo apt install curl build-essential intltool -y
+      run: sudo apt update && sudo apt install curl build-essential intltool asciidoc -y
       
     - name: Install latest Rust Toolchain
       uses: actions-rs/toolchain@v1
@@ -46,6 +46,8 @@ jobs:
       run: |
         mkdir $LOC_SRC_DIR
         tar xfv $LOC_DL_PATH -C $LOC_SRC_DIR
+        
+    
       
     - name: Build and Install loc
       working-directory: ${{ env.LOC_SRC_DIR }}/${{ env.LOC_VERSION }}
@@ -58,11 +60,11 @@ jobs:
     - name: Dump all location data
       run: |
         location update
-        location dump $DUMP_PATH
+        location dump ~/$DUMP_PATH
         
     - name: Run Conversion Tool
       working-directory: ${{ env.TOR_SRC_DIR }}/scripts/maint/geoip/geoip-db-tool
       run: |
         cargo build --release
-        cargo run --release -- -i $GITHUB_WORKSPACE/$DUMP_PATH -4 $GITHUB_WORKSPACE/$EXPORT_DIR/geoip -6 $GITHUB_WORKSPACE/$EXPORT_DIR/geoip6
+        cargo run --release -- -i ~/$DUMP_PATH -4 $GITHUB_WORKSPACE/$EXPORT_DIR/geoip -6 $GITHUB_WORKSPACE/$EXPORT_DIR/geoip6
       
