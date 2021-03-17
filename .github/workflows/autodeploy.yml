@@ -7,6 +7,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   EXPORT_DIR: "public"
+  TOR_SRC_DIR: "~/tor-src"
   IMAGE_NAME: "dragonfruit/onionfruit-geoip:current"
   
 jobs:
