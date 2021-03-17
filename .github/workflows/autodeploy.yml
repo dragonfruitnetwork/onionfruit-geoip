@@ -20,11 +20,10 @@ jobs:
     - name: Install Dependencies
       run: sudo apt update && sudo apt install curl coreutils apt-transport-https ca-certificates gnupg lsb-release -y
         
-    - name: Install latest Rust Toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
+    - name: Install rust
+      run: |
+        curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable
+        echo "$(realpath ~/.cargo/bin)" >> $GITHUB_PATH
         
     - name: Install Docker
       run: |
