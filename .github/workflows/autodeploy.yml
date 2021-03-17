@@ -45,13 +45,11 @@ jobs:
     - name: Build Tool
       uses: actions-rs/cargo@v1
       with:
-        working-directory: ${{ env.TOR_SRC_DIR }}/scripts/maint/geoip/geoip-db-tool
         command: build
-        args: --release
+        args: --release --manifest-path $TOR_SRC_DIR/scripts/maint/geoip/geoip-db-tool/Cargo.toml
         
     - name: Run Tool
       uses: actions-rs/cargo@v1
       with:
-        working-directory: ${{ env.TOR_SRC_DIR }}/scripts/maint/geoip/geoip-db-tool
         command: run
-        args: --release -- -i ~/dmp.txt -4 $GITHUB_WORKSPACE/$EXPORT_DIR/geoip -6 $GITHUB_WORKSPACE/$EXPORT_DIR/geoip6
+        args: --release --manifest-path $TOR_SRC_DIR/scripts/maint/geoip/geoip-db-tool/Cargo.toml -- -i ~/dmp.txt -4 $GITHUB_WORKSPACE/$EXPORT_DIR/geoip -6 $GITHUB_WORKSPACE/$EXPORT_DIR/geoip6
