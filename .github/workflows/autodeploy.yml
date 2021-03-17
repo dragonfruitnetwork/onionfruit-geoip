@@ -44,13 +44,16 @@ jobs:
     - name: Prepare loc
       working-directory: ${{ env.LOC_SRC_DIR }}/${{ env.LOC_VERSION }}
       run: |
+        ./autogen.sh
         ./configure CFLAGS='-g -O2' --disable-perl --without-systemd --prefix=/opt/liblo
         
-    - name: Build and install loc
+    - name: Build loc
       working-directory: ${{ env.LOC_SRC_DIR }}/${{ env.LOC_VERSION }}
-      run: |
-        make
-        make install
+      run: make
+        
+    - name: Install loc
+      working-directory: ${{ env.LOC_SRC_DIR }}/${{ env.LOC_VERSION }}
+      run: sudo make install
         
     - name: Dump all location data
       run: |
