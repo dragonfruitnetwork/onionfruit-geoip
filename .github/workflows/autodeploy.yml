@@ -20,11 +20,6 @@ jobs:
       
     - name: Install Dependencies
       run: sudo apt update && sudo apt install curl coreutils apt-transport-https ca-certificates gnupg lsb-release -y
-      
-    - name: Setup Rust Toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
         
     - name: Install Docker
       run: |
