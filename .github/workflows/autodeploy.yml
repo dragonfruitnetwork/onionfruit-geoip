@@ -21,6 +21,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       
+    - name: Update PATH
+      run: echo "/usr/local/bin" >> $GITHUB_PATH
+      
     - name: Install Dependencies
       run: sudo apt update && sudo apt install curl build-essential intltool asciidoc python3.8 python3.9 software-properties-common -y
       
@@ -45,7 +48,7 @@ jobs:
       working-directory: ${{ env.LOC_SRC_DIR }}/${{ env.LOC_VERSION }}
       run: |
         ./autogen.sh
-        ./configure CFLAGS='-g' --disable-perl --without-systemd
+        ./configure CFLAGS='-g' --disable-perl --without-systemd --prefix=/usr/local
         
     - name: Build loc
       working-directory: ${{ env.LOC_SRC_DIR }}/${{ env.LOC_VERSION }}
