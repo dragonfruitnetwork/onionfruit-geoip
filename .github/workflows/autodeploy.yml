@@ -7,7 +7,6 @@ on:
 env:
   CARGO_TERM_COLOR: always
   EXPORT_DIR: "public"
-  TOR_SRC_DIR: "~/tor-src"
   IMAGE_NAME: "dragonfruit/onionfruit-geoip:current"
   
 jobs:
@@ -41,16 +40,16 @@ jobs:
         docker container logs geoip-control -f
 
     - name: Clone Tor
-      run: git clone https://github.com/torproject/tor.git --depth 1 $TOR_SRC_DIR
+      run: git clone https://github.com/torproject/tor.git --depth 1 ~/tor-src
         
     - name: Build Tool
       uses: actions-rs/cargo@v1
       with:
         command: build
-        args: --release --manifest-path $TOR_SRC_DIR/scripts/maint/geoip/geoip-db-tool/Cargo.toml
+        args: --release --manifest-path ~/tor-src/scripts/maint/geoip/geoip-db-tool/Cargo.toml
         
     - name: Run Tool
       uses: actions-rs/cargo@v1
       with:
         command: run
-        args: --release --manifest-path $TOR_SRC_DIR/scripts/maint/geoip/geoip-db-tool/Cargo.toml -- -i ~/dmp.txt -4 $GITHUB_WORKSPACE/$EXPORT_DIR/geoip -6 $GITHUB_WORKSPACE/$EXPORT_DIR/geoip6
+        args: --release --manifest-path ~/tor-src/scripts/maint/geoip/geoip-db-tool/Cargo.toml -- -i ~/dmp.txt -4 $GITHUB_WORKSPACE/$EXPORT_DIR/geoip -6 $GITHUB_WORKSPACE/$EXPORT_DIR/geoip6
