@@ -6,11 +6,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  LOC_VERSION: "libloc-0.9.5"
-  LOC_DL_PATH: "~/loc.tar.gz"
-  TOR_SRC_DIR: "~/tor-src"
-  LOC_SRC_DIR: "~/loc-src"
-  DUMP_PATH: "dump.txt"
+  DUMP_PATH: "~/dmp/dump.txt"
   EXPORT_DIR: "public"
   
 jobs:
@@ -22,43 +18,28 @@ jobs:
       uses: actions/checkout@v2
       
     - name: Install Dependencies
-      run: sudo apt update && sudo apt install curl build-essential intltool asciidoc python3.8 python3.9 software-properties-common -y
-      
-    - name: Update PATH
-      run: |
-        echo ":/usr/local/bin" >> $GITHUB_PATH#
-        echo ":/usr/local/lib" >> $PYTHONPATH
+      run: sudo apt update && sudo apt install curl -y
         
     - name: Install latest Rust Toolchain
       uses: actions-rs/toolchain@v1
       with:
         profile: minimal
         toolchain: stable
+        
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build and push
+      id: docker_build
+      uses: docker/build-push-action@v2
+      with:
+        context: ./
+        file: ./build/Dockerfile
+        push: false
+        tags: dragonfruit/location:latest
 
     - name: Clone Tor
       run: git clone https://github.com/torproject/tor.git --depth 1 $TOR_SRC_DIR
-      
-    - name: Download loc
-      run: curl https://source.ipfire.org/releases/libloc/$LOC_VERSION.tar.gz -o $LOC_DL_PATH
-      
-    - name: Extract loc
-      run: |
-        mkdir $LOC_SRC_DIR
-        tar xfv $LOC_DL_PATH -C $LOC_SRC_DIR
-        
-    - name: Prepare loc
-      working-directory: ${{ env.LOC_SRC_DIR }}/${{ env.LOC_VERSION }}
-      run: |
-        ./autogen.sh
-        ./configure CFLAGS='-g' --disable-perl --without-systemd --prefix=/usr/local
-        
-    - name: Build loc
-      working-directory: ${{ env.LOC_SRC_DIR }}/${{ env.LOC_VERSION }}
-      run: make
-        
-    - name: Install loc
-      working-directory: ${{ env.LOC_SRC_DIR }}/${{ env.LOC_VERSION }}
-      run: sudo make install
         
     - name: Dump all location data
       run: |
