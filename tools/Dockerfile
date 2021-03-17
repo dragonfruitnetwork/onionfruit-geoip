@@ -10,7 +10,6 @@ RUN apt update && apt install location
 
 RUN mkdir /app
 
-WORKDIR /app
-RUN echo "location update && location dump dmp.txt" >> script.sh
+RUN echo "location update && location dump /app/out/dmp.txt" >> /app/script.sh
 
-ENTRYPOINT ["script.sh"]
+ENTRYPOINT ["/app/script.sh"]
