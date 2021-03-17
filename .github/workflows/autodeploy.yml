@@ -39,5 +39,5 @@ jobs:
         
     - name: Run Tool
       run: |
-        docker run --name geoip-tool -v $(realpath ~/):/data-in -v $(realpath $GITHUB_WORKSPACE/$EXPORT_DIR):/data-out
+        docker run --name geoip-tool -v $(realpath ~/):/data-in -v $(realpath $GITHUB_WORKSPACE/$EXPORT_DIR):/data-out $TOOL_IMAGE_NAME
         docker container logs geoip-tool -f
