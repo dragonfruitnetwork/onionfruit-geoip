@@ -8,6 +8,7 @@ env:
   CARGO_TERM_COLOR: always
   EXPORT_DIR: "public"
   IMAGE_NAME: "dragonfruit/onionfruit-geoip:current"
+  TOOL_IMAGE_NAME: "dragonfruit/onionfruit-geotool:current"
   
 jobs:
   deploy:
@@ -19,11 +20,6 @@ jobs:
       
     - name: Install Dependencies
       run: sudo apt update && sudo apt install curl coreutils apt-transport-https ca-certificates gnupg lsb-release -y
-      
-    - name: Setup Rust Toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
         
     - name: Install Docker
       run: |
@@ -31,25 +27,17 @@ jobs:
         echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
         sudo apt update && sudo apt install docker-ce docker-ce-cli -y
 
-    - name: Build Image
-      run: docker build -f $GITHUB_WORKSPACE/tools/Dockerfile -t $IMAGE_NAME .
+    - name: Build Images
+      run: |
+        docker build -f $GITHUB_WORKSPACE/tools/Dockerfile -t $IMAGE_NAME .
+        docker build -f $GITHUB_WORKSPACE/tools/Dockerfile-tool -t $TOOL_IMAGE_NAME .
     
     - name: Run Image
       run: |
         docker run --name geoip-control -v $(realpath ~/):/app/out $IMAGE_NAME
         docker container logs geoip-control -f
-
-    - name: Clone Tor
-      run: git clone https://github.com/torproject/tor.git --depth 1 ~/tor-src
-        
-    - name: Build Tool
-      uses: actions-rs/cargo@v1
-      with:
-        command: build
-        args: --release --manifest-path ~/tor-src/scripts/maint/geoip/geoip-db-tool/Cargo.toml
         
     - name: Run Tool
-      uses: actions-rs/cargo@v1
-      with:
-        command: run
-        args: --release --manifest-path ~/tor-src/scripts/maint/geoip/geoip-db-tool/Cargo.toml -- -i ~/dmp.txt -4 $GITHUB_WORKSPACE/$EXPORT_DIR/geoip -6 $GITHUB_WORKSPACE/$EXPORT_DIR/geoip6
+      run: |
+        docker run --name geoip-tool -v $(realpath ~/):/data-in -v $(realpath $GITHUB_WORKSPACE/$EXPORT_DIR):/data-out
+        docker container logs geoip-tool -f
