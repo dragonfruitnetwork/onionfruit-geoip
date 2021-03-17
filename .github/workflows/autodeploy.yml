@@ -44,15 +44,17 @@ jobs:
         mkdir $LOC_SRC_DIR
         tar xfv $LOC_DL_PATH -C $LOC_SRC_DIR
         
-    
-      
-    - name: Build and Install loc
+    - name: Prepare loc
       working-directory: ${{ env.LOC_SRC_DIR }}/${{ env.LOC_VERSION }}
       run: |
         ./autogen.sh
-        ./configure CFLAGS='-g -O2' --disable-perl --without-systemd --prefix=/opt/libloc
+        ./configure CFLAGS='-g -O2' --disable-perl --without-systemd --prefix=/opt/liblo
+        
+    - name: Build and install loc
+      working-directory: ${{ env.LOC_SRC_DIR }}/${{ env.LOC_VERSION }}
+      run: |
         make
-        sudo make install
+        make install
         
     - name: Dump all location data
       run: |
