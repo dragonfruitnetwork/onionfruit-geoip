@@ -41,3 +41,9 @@ jobs:
       run: |
         docker run --name geoip-tool -v $(realpath ~/):/data-in -v $(realpath $GITHUB_WORKSPACE/$EXPORT_DIR):/data-out $TOOL_IMAGE_NAME
         docker container logs geoip-tool -f
+        
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@4.1.0
+      with:
+        branch: live
+        folder: ${{ env.GITHUB_WORKSPACE }}/${{ env.EXPORT_DIR }}
