@@ -1,9 +1,9 @@
 FROM debian
 
+RUN apt update && apt install curl software-properties-common ca-certificates -y
+
 RUN echo "deb     https://packages.ipfire.org/location buster/" >> /etc/apt/sources.list.d/location.list
 RUN echo "deb-src https://packages.ipfire.org/location buster/" >> /etc/apt/sources.list.d/location.list
-
-RUN apt update && apt install curl software-properties-common ca-certificates -y
 RUN curl https://packages.ipfire.org/79842AA7CDBA7AE3-pub.asc | apt-key add -
 
 RUN apt update && apt install location
