@@ -22,7 +22,7 @@ jobs:
       uses: actions/checkout@v2
       
     - name: Install Dependencies
-      run: sudo apt update && sudo apt install curl build-essential -y
+      run: sudo apt update && sudo apt install curl build-essential intltool -y
       
     - name: Install latest Rust Toolchain
       uses: actions-rs/toolchain@v1
