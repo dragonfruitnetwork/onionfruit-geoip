@@ -17,6 +17,9 @@ jobs:
     steps:      
     - name: Checkout
       uses: actions/checkout@v2.3.4
+    
+    - name: Prepare Export Directory
+      run: sudo cp -R $GITHUB_WORKSPACE/$EXPORT_DIR ~/$EXPORT_DIR
       
     - name: Install Dependencies
       run: sudo apt update && sudo apt install curl coreutils apt-transport-https ca-certificates gnupg lsb-release -y
@@ -27,10 +30,11 @@ jobs:
         echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
         sudo apt update && sudo apt install docker-ce docker-ce-cli -y
 
-    - name: Build Images
-      run: |
-        docker build -f $GITHUB_WORKSPACE/tools/Dockerfile -t $IMAGE_NAME .
-        docker build -f $GITHUB_WORKSPACE/tools/Dockerfile-tool -t $TOOL_IMAGE_NAME .
+    - name: Build Location Tool
+      run: docker build -f $GITHUB_WORKSPACE/containers/location/Dockerfile -t $IMAGE_NAME .
+        
+    - name: Build Data Processor Tool
+      run: docker build -f $GITHUB_WORKSPACE/containers/tor-geoip-tool/Dockerfile -t $TOOL_IMAGE_NAME .
     
     - name: Run Image
       run: |
@@ -39,9 +43,8 @@ jobs:
         
     - name: Run Tool
       run: |
-        docker run --name geoip-tool -v $(realpath ~/):/data-in -v $(realpath $GITHUB_WORKSPACE/$EXPORT_DIR):/data-out $TOOL_IMAGE_NAME
+        docker run --name geoip-tool -v $(realpath ~/):/data-in -v $(realpath ~/$EXPORT_DIR):/data-out $TOOL_IMAGE_NAME
         docker container logs geoip-tool -f
-        sudo cp -R $GITHUB_WORKSPACE/$EXPORT_DIR ~/$EXPORT_DIR
         
     - name: Deploy
       uses: JamesIves/github-pages-deploy-action@4.1.0
