@@ -38,7 +38,7 @@ jobs:
       run: docker build -t $IMAGE_NAME $GITHUB_WORKSPACE/containers/location
         
     - name: Build Data Processor Tool
-      run: docker build -t $TOOL_IMAGE_NAME . $GITHUB_WORKSPACE/containers/tor-geoip-tool
+      run: docker build -t $TOOL_IMAGE_NAME $GITHUB_WORKSPACE/containers/tor-geoip-tool
     
     - name: Run Location Tool
       run: |
