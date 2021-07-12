@@ -3,16 +3,16 @@ name: Auto deploy
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
   schedule:
     - cron: "0 4 * * 1,4"
+  workflow_dispatch: { }
 
 env:
   CARGO_TERM_COLOR: always
   EXPORT_DIR: "public"
   IMAGE_NAME: "dragonfruit/onionfruit-geoip:current"
   TOOL_IMAGE_NAME: "dragonfruit/onionfruit-geotool:current"
+  COUNTRIES_IMAGE_NAME: "dragonfruitdotnet/onionfruit-country-engine:latest"
   
 jobs:
   deploy:
@@ -49,6 +49,11 @@ jobs:
       run: |
         docker run --name geoip-tool -v $(realpath ~/):/data-in -v $(realpath ~/$EXPORT_DIR):/data-out $TOOL_IMAGE_NAME
         docker container logs geoip-tool -f
+        
+    - name: Run countries.json Generator
+      run: |
+        docker run --name countries-generator -v $(realpath ~/$EXPORT_DIR):/output $COUNTRIES_IMAGE_NAME
+        docker container logs countries-generator -f
         
     - name: Deploy
       uses: JamesIves/github-pages-deploy-action@4.1.0
