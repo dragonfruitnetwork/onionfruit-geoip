@@ -6,6 +6,6 @@ RUN echo "deb     https://packages.ipfire.org/location buster/" >> /etc/apt/sour
 RUN echo "deb-src https://packages.ipfire.org/location buster/" >> /etc/apt/sources.list.d/location.list
 RUN curl -fsSL https://packages.ipfire.org/79842AA7CDBA7AE3-pub.asc | apt-key add -
 
-RUN apt update apt install location -y
+RUN apt update && apt install location -y
 
 CMD location update && location dump /app/out/dmp.txt
