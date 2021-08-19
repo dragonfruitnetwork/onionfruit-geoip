@@ -1,4 +1,4 @@
-FROM 3.7-bullseye
+FROM python:3.7-bullseye
 
 RUN apt update && apt install curl software-properties-common ca-certificates gnupg2 -y
 
