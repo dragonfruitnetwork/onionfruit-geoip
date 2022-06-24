@@ -12,7 +12,6 @@ env:
   EXPORT_DIR: "public"
   IMAGE_NAME: "dragonfruit/onionfruit-geoip:current"
   TOOL_IMAGE_NAME: "dragonfruit/onionfruit-geotool:current"
-  COUNTRIES_IMAGE_NAME: "dragonfruitdotnet/onionfruit-country-engine:latest"
   
 jobs:
   deploy:
@@ -27,6 +26,11 @@ jobs:
       
     - name: Install Dependencies
       run: sudo apt update && sudo apt install curl coreutils apt-transport-https ca-certificates gnupg lsb-release -y
+        
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '6.0.x'
         
     - name: Install Docker
       run: |
@@ -50,10 +54,11 @@ jobs:
         docker run --name geoip-tool -v $(realpath ~/):/data-in -v $(realpath ~/$EXPORT_DIR):/data-out $TOOL_IMAGE_NAME
         docker container logs geoip-tool -f
         
-    - name: Run countries.json Generator
+    - name: Run Database Generator
       run: |
-        docker run --name countries-generator -v $(realpath ~/$EXPORT_DIR):/output $COUNTRIES_IMAGE_NAME
-        docker container logs countries-generator -f
+        cd $GITHUB_WORKSPACE/generator
+        dotnet build -c Release
+        OUTPUT_DIR=$(realpath ~/$EXPORT_DIR) dotnet run
         
     - name: Deploy
       uses: JamesIves/github-pages-deploy-action@v4.3.0
