@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Bia.Countries.Iso3166;
 using DragonFruit.Data.Serializers.Newtonsoft;
 using DragonFruit.OnionFruit.Api.Enums;
 using DragonFruit.OnionFruit.Api.Objects;
@@ -68,7 +69,11 @@ namespace DragonFruit.OnionFruit.Data.Components
         public CountryInfo(string countryCode)
         {
             CountryCode = countryCode;
+            CountryName = Countries.GetCountryByAlpha2(countryCode).ActiveDirectoryName;
         }
+
+        [JsonProperty("country_name")]
+        public string CountryName { get; }
 
         [JsonProperty("country_code")]
         public string CountryCode { get; set; }
