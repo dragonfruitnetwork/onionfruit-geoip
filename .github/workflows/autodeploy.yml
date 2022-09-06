@@ -1,5 +1,10 @@
 name: Auto deploy
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 on:
   push:
     branches: [ main ]
@@ -9,22 +14,26 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  EXPORT_DIR: "public"
+  EXPORT_DIR: "/public"
   IMAGE_NAME: "dragonfruit/onionfruit-geoip:current"
   TOOL_IMAGE_NAME: "dragonfruit/onionfruit-geotool:current"
   
 jobs:
   deploy:
-    runs-on: ubuntu-20.04
-
+    runs-on: ubuntu-latest
+    
+    environment:
+      name: production
+      url: https://onioncdn.dragonfruit.network
+      
     steps:      
     - name: Checkout
       uses: actions/checkout@v2.3.4
     
     - name: Prepare Export Directory
       run: |
-        sudo cp -R $GITHUB_WORKSPACE/$EXPORT_DIR ~/$EXPORT_DIR
-        sudo chmod -R 777 ~/$EXPORT_DIR
+        sudo cp -R $GITHUB_WORKSPACE/$EXPORT_DIR $EXPORT_DIR
+        sudo chmod -R 777 $EXPORT_DIR
       
     - name: Install Dependencies
       run: sudo apt update && sudo apt install curl coreutils apt-transport-https ca-certificates gnupg lsb-release -y
@@ -33,12 +42,6 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: '6.0.x'
-        
-    - name: Install Docker
-      run: |
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-        sudo apt update && sudo apt install docker-ce docker-ce-cli -y
 
     - name: Build Location Tool
       run: docker build -t $IMAGE_NAME $GITHUB_WORKSPACE/containers/location
@@ -53,20 +56,23 @@ jobs:
         
     - name: Run Data Processor Tool
       run: |
-        docker run --name geoip-tool -v $(realpath ~/):/data-in -v $(realpath ~/$EXPORT_DIR):/data-out $TOOL_IMAGE_NAME
+        docker run --name geoip-tool -v $(realpath ~/):/data-in -v $EXPORT_DIR:/data-out $TOOL_IMAGE_NAME
         docker container logs geoip-tool -f
         
     - name: Run Database Generator
       run: |
         cd $GITHUB_WORKSPACE/generator
         dotnet build -c Release
-        OUTPUT_DIR=$(realpath ~/$EXPORT_DIR) dotnet run
+        OUTPUT_DIR=$EXPORT_DIR dotnet run
         
-    - name: Deploy
-      uses: JamesIves/github-pages-deploy-action@v4.3.0
-      if: github.repository_owner == 'dragonfruitnetwork'
+    - name: Setup Pages
+      uses: actions/configure-pages@v2
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v1
       with:
-        branch: live
-        folder: ~/${{ env.EXPORT_DIR }}
-        git-config-name: "Yuna"
-        git-config-email: "inbox@dragonfruit.network"
+        path: ${{ env.EXPORT_DIR }}
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@main
