@@ -7,6 +7,10 @@ GeoIP CDN for OnionFruit™
 [![DragonFruit Discord](https://img.shields.io/discord/482528405292843018?label=Discord&style=popout)](https://discord.gg/VA26u5Z)
 
 ### Overview
+
+> [!WARNING]
+> This system is no longer in use, all databases are now generated and served by [onionfruit-web](https://github.com/dragonfruitnetwork/onionfruit-web)
+
 This is a project that aims to provide timed releases/updates to the databases OnionFruit™ Connect (Client) uses to provide country-related information.
 The assets are then published publicly for anyone to use.
 
